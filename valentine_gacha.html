@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>情人节限定卡池</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: "Microsoft YaHei", sans-serif;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ff6a88, #ff99ac);
+}
+.card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 25px 20px;
+    width: 90vw;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    animation: pop 0.6s ease;
+}
+@keyframes pop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+h1 {
+    margin: 0 0 15px;
+    font-size: 22px;
+    line-height: 1.2;
+}
+input {
+    width: 90%;
+    padding: 16px;
+    font-size: 18px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    outline: none;
+    margin-bottom: 12px;
+}
+button {
+    margin-top: 12px;
+    padding: 16px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 30px;
+    background: #ff4d6d;
+    color: white;
+    cursor: pointer;
+    width: 70%;
+    max-width: 220px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255,77,109,0.6);
+}
+.result {
+    margin-top: 20px;
+    font-size: 18px;
+    min-height: 60px;
+    word-break: break-word;
+}
+.ssr {
+    color: #ff2e63;
+    font-weight: bold;
+    animation: glow 1s infinite alternate;
+}
+@keyframes glow { from { text-shadow: 0 0 5px #ff2e63; } to { text-shadow: 0 0 20px #ff2e63; } }
+.emoji {
+    position: absolute;
+    font-size: 24px;
+    animation: float 4s linear infinite;
+    opacity: 0.8;
+}
+@keyframes float { from { transform: translateY(100vh); } to { transform: translateY(-10vh); } }
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    pointer-events: none;
+    opacity: 0.8;
+}
+.fullscreen-red {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: red;
+    color: white;
+    font-size: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+@media (max-width: 500px) {
+    h1 { font-size: 20px; }
+    input { font-size: 16px; padding: 14px; }
+    button { font-size: 16px; padding: 14px 25px; }
+    .result { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🎉❤️ 情人节限定卡池 ❤️🎉</h1>
+    <input id="nameInput" placeholder="输入名字">
+    <br>
+    <button onclick="draw()">🎰 开始抽取</button>
+    <div class="result" id="result">等待抽取中……</div>
+</div>
+
+<script>
+const pool = [
+    ["滚你妈的", 10], ["去你妈的", 10], ["你也配？", 10], ["傻逼二次元", 10], ["癔症又犯了？", 10],
+    ["死男同真恶心", 5], ["现在是幻想时刻", 5], ["柚子厨滚出去", 5], ["这是最后通牒", 5],
+    ["以后不要再和我扯上关系", 5], ["被拉黑+屏蔽", 5], ["小男娘", 5], ["随机的网图", 2.5],
+    ["随机的贴吧圣经", 2.5], ["下次再说吧", 2.5], ["你是个好人", 2.5], ["我一直把你当好朋友", 2.5],
+    ["滚出去", 2.49], ["好呀宝宝 ❤️（SSR）", 0.01], ["其实我也喜欢你好久了 💖（隐藏款）", 0.001]
+];
+
+function drawWeighted(pool) {
+    const total = pool.reduce((s, i) => s + i[1], 0);
+    let r = Math.random() * total;
+    for (const [text, weight] of pool) { if ((r -= weight) <= 0) return text; }
+}
+
+function draw() {
+    const name = document.getElementById("nameInput").value.trim();
+    const resultDiv = document.getElementById("result");
+    if (!name) { resultDiv.innerText = "⚠️ 请输入名字"; return; }
+    const res = drawWeighted(pool);
+
+    if (res.includes("SSR") || res.includes("隐藏")) {
+        resultDiv.innerHTML = `🎉 ${name}<br><span class="ssr">${res}</span>`;
+        spawnEmoji("💖");
+        spawnEmoji("✨");
+        spawnConfetti();
+    } else if (res.includes("被拉黑")) {
+        showRedScreen(name, res);
+    } else {
+        resultDiv.innerText = `🎁 ${name}\n${res}`;
+    }
+}
+
+function spawnEmoji(char) {
+    for (let i=0;i<20;i++){
+        const e=document.createElement("div");
+        e.className="emoji";
+        e.innerText=char;
+        e.style.left=Math.random()*100+"vw";
+        e.style.animationDuration=(2+Math.random()*3)+"s";
+        document.body.appendChild(e);
+        setTimeout(()=>e.remove(),4000);
+    }
+}
+
+function spawnConfetti() {
+    const colors = ["#ff4d6d","#ffcd56","#4dffb8","#6a5aff"];
+    for(let i=0;i<50;i++){
+        const c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"vw";
+        c.style.top="-10px";
+        c.style.background=colors[Math.floor(Math.random()*colors.length)];
+        c.style.width=(5+Math.random()*5)+"px";
+        c.style.height=(5+Math.random()*5)+"px";
+        document.body.appendChild(c);
+        let fall = setInterval(()=>{
+            c.style.top=(parseFloat(c.style.top)+Math.random()*10)+"px";
+            c.style.transform="rotate("+Math.random()*360+"deg)";
+            if(parseFloat(c.style.top)>window.innerHeight){ c.remove(); clearInterval(fall);}
+        },30);
+    }
+}
+
+function showRedScreen(name,res){
+    const red = document.createElement("div");
+    red.className="fullscreen-red";
+    red.innerText=`${name} 抽到 ${res}！`;
+    document.body.appendChild(red);
+    setTimeout(()=>red.remove(),3000);
+}
+</script>
+
+</body>
+</html>
