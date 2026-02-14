@@ -67,6 +67,11 @@ button:hover {
     min-height: 60px;
     word-break: break-word;
 }
+.result img {
+    max-width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
 .ssr {
     color: #ff2e63;
     font-weight: bold;
@@ -152,12 +157,17 @@ function draw() {
 
     let res;
     if (name === "Angel No.13") {
-        res = "其实我也喜欢你好久了 💖（隐藏款）";
+        res = "AngelSpecialImage";
     } else {
         res = drawWeighted(pool);
     }
 
-    if (res.includes("SSR")) {
+    if (res === "AngelSpecialImage") {
+        // 显示指定图片
+        resultDiv.innerHTML = `<img src="https://tse4.mm.bing.net/th/id/OIP.JZ-WkrhceRUEikjBsRGJugHaHS?cb=defcache2&defcache=1&rs=1&pid=ImgDetMain&o=7&rm=3" alt="隐藏款">`;
+        spawnHeartScreen("💖", 250, true);
+        spawnConfetti();
+    } else if (res.includes("SSR")) {
         resultDiv.innerHTML = `🎉 ${name}<br><span class="ssr">${res}</span>`;
         spawnHeartScreen("💖", 100);
         spawnConfetti();
