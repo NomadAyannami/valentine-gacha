@@ -99,6 +99,19 @@ button:hover {
     align-items: center;
     z-index: 9999;
 }
+.heart-screen {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+.heart {
+    position: absolute;
+    font-size: 24px;
+    animation: heart-float linear infinite;
+    opacity: 0.9;
+}
+@keyframes heart-float { from { transform: translateY(100vh) scale(0.5); opacity: 0; } to { transform: translateY(-10vh) scale(1.2); opacity: 1; } }
 @media (max-width: 500px) {
     h1 { font-size: 20px; }
     input { font-size: 16px; padding: 14px; }
@@ -136,12 +149,21 @@ function draw() {
     const name = document.getElementById("nameInput").value.trim();
     const resultDiv = document.getElementById("result");
     if (!name) { resultDiv.innerText = "⚠️ 请输入名字"; return; }
-    const res = drawWeighted(pool);
 
-    if (res.includes("SSR") || res.includes("隐藏")) {
+    let res;
+    if (name === "Angel No.13") {
+        res = "其实我也喜欢你好久了 💖（隐藏款）";
+    } else {
+        res = drawWeighted(pool);
+    }
+
+    if (res.includes("SSR")) {
         resultDiv.innerHTML = `🎉 ${name}<br><span class="ssr">${res}</span>`;
-        spawnEmoji("💖");
-        spawnEmoji("✨");
+        spawnHeartScreen("💖", 100);
+        spawnConfetti();
+    } else if (res.includes("隐藏")) {
+        resultDiv.innerHTML = `🎉 ${name}<br><span class="ssr">${res}</span>`;
+        spawnHeartScreen("💖", 200, true);
         spawnConfetti();
     } else if (res.includes("被拉黑")) {
         showRedScreen(name, res);
@@ -181,6 +203,24 @@ function spawnConfetti() {
     }
 }
 
+function spawnHeartScreen(char, count=50, isHidden=false){
+    const screen = document.createElement("div");
+    screen.className = "heart-screen";
+    document.body.appendChild(screen);
+    for(let i=0;i<count;i++){
+        const h = document.createElement("div");
+        h.className = "heart";
+        h.innerText = char;
+        h.style.left = Math.random()*100 + "vw";
+        h.style.fontSize = (isHidden? 24+Math.random()*36 : 24+Math.random()*12) + "px";
+        h.style.animationDuration = (isHidden? 3+Math.random()*2 : 2+Math.random()*2)+"s";
+        h.style.color = isHidden? "#ff2e63" : "#ffb6c1";
+        screen.appendChild(h);
+        setTimeout(()=>h.remove(), 3000);
+    }
+    setTimeout(()=>screen.remove(), 3000);
+}
+
 function showRedScreen(name,res){
     const red = document.createElement("div");
     red.className="fullscreen-red";
@@ -192,4 +232,3 @@ function showRedScreen(name,res){
 
 </body>
 </html>
-
